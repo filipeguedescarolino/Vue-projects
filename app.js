@@ -2,46 +2,31 @@ const app = Vue.createApp({
 
     data() {
         return {
-            number: 0,
-
+            // retrieve the data input
+            inputClass: "",
+            paragraphIsVisible: true,
+            inputBackgroundColor: "",
         }
     },
 
     computed: {
-        result() {
-            if (this.number < 37) {
-                return "not there yet"
-            } else if (this.number === 37) {
-                return this.number
-            } else {
-                return "too much"
+        paraClasses() {
+            return {
+                user1: this.inputClass === "user1",
+                user2: this.inputClass === "user2",
+                visible: this.paragraphIsVisible,
+                hidden: !this.paragraphIsVisible
             }
-
-
-        }
-    },
-
-    watch: {
-        result() {
-            const that = this;
-            setTimeout(function() {
-                that.number = 0
-            }, 5000);
         }
     },
 
     methods: {
-        addNumber(value) {
-            this.number = this.number + value
-
+        toggleParagraphVisibility() {
+            this.paragraphIsVisible = !this.paragraphIsVisible
         }
-
-
-
     }
 
 
-
-});
+})
 
 app.mount('#assignment')
