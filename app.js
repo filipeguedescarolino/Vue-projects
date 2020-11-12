@@ -2,30 +2,27 @@ const app = Vue.createApp({
 
     data() {
         return {
-            // retrieve the data input
-            inputClass: "",
-            paragraphIsVisible: true,
-            inputBackgroundColor: "",
+            tasks: [],
+            inputValue: "",
+            taskListIsVisible: true,
         }
     },
 
     computed: {
-        paraClasses() {
-            return {
-                user1: this.inputClass === "user1",
-                user2: this.inputClass === "user2",
-                visible: this.paragraphIsVisible,
-                hidden: !this.paragraphIsVisible
-            }
+        buttonCaption() {
+            return this.taskListIsVisible ? "Hide list" : "Show List";
         }
     },
 
     methods: {
-        toggleParagraphVisibility() {
-            this.paragraphIsVisible = !this.paragraphIsVisible
+        addTask() {
+            this.tasks.push(this.inputValue);
+            this.inputValue = "";
+        },
+        toggleTaskList() {
+            this.taskListIsVisible = !this.taskListIsVisible
         }
     }
-
 
 })
 
