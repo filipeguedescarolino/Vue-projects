@@ -1,29 +1,123 @@
+function getRandomValue(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
 const app = Vue.createApp({
 
     data() {
         return {
-            tasks: [],
-            inputValue: "",
-            taskListIsVisible: true,
+            //primeiro manage player and monster health
+            playerHealth: 100,
+            monsterHealth: 100,
+            //rounds to specialattack
+            currentRound: 0,
+            winner: null,
+            logMessages: [],
+
+
         }
     },
 
     computed: {
-        buttonCaption() {
-            return this.taskListIsVisible ? "Hide list" : "Show List";
+        monsterBarStyles() {
+            if (this.monsterHealth < 0) {
+                return { width: '0%' };
+            }
+            return {
+                width: this.monsterHealth + '%'
+            }
+        },
+        playerBarStyles() {
+            if (this.playerHealth < 0) {
+                return { width: '0%' }
+            }
+            return {
+                width: this.playerHealth + '%'
+            }
+        },
+        mayUseSpecialAttack() {
+            return this.currentRound % 3 !== 0;
         }
+
+        // to disable special attack buttons other than every 3 rounds
+    },
+    watch: {
+        playerHealth(value) {
+            if (value <= 0 && this.monsterHealth <= 0) {
+                this.winner = 'Draw!';
+            } else if (value <= 0) {
+                this.winner = 'Monster'
+
+            }
+        },
+        monsterHealth(value) {
+            if (value <= 0 && this.playerHealth <= 0) {
+                this.winner = "Draw"
+            } else if (value <= 0) {
+                this.winner = "Player"
+            }
+        }
+
     },
 
     methods: {
-        addTask() {
-            this.tasks.push(this.inputValue);
-            this.inputValue = "";
+        attackMonster() {
+            this.currentRound++;
+            // calculate dmg and reduce health
+            const attackValue = getRandomValue(5, 12);
+            // podiamos calcular this.monsterHealth -= attackValue
+            this.monsterHealth = this.monsterHealth - attackValue;
+            this.addLogMessage('player', 'attack', attackValue)
+            this.attackPlayer();
         },
-        toggleTaskList() {
-            this.taskListIsVisible = !this.taskListIsVisible
+        attackPlayer() {
+            const attackValue = getRandomValue(15, 8);
+            this.playerHealth -= attackValue;
+            this.addLogMessage('monster', 'attack', attackValue);
+        },
+        //special attack
+        specialAttackMonster() {
+            this.currentRound++;
+            const attackValue = getRandomValue(10, 25);
+            this.monsterHealth -= attackValue;
+            this.addLogMessage('player', 'attack', attackValue);
+            this.attackPlayer();
+        },
+        //healPlayer
+        healPlayer() {
+            this.currentRound++;
+            const healValue = getRandomValue(8, 20);
+            if (this.playerHealth + healValue > 100) {
+                this.playerHealth = 100
+            } else {
+                this.playerHealth += healValue;
+            }
+            this.addLogMessage('player', 'heal', healValue);
+            this.attackPlayer();
+        },
+
+        startGame() {
+            this.monsterHealth = 100;
+            this.playerHealth = 100;
+            this.winner = null;
+            this.currentRound = 0;
+            this.logMessages = [];
+        },
+
+        surrender() {
+            this.winner = 'Monster';
+        },
+        addLogMessage(who, what, value) {
+            this.logMessages.unshift({
+                actionBy: who,
+                actionType: what,
+                actionValue: value
+            });
+
         }
     }
 
-})
 
-app.mount('#assignment')
+});
+
+app.mount("#game");
